@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>멀리건즈 대회 순위표</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 10px;
+}
+h1, h2 { text-align: center; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    text-align: center;
+}
+th {
+    background: #2c3e50;
+    color: white;
+}
+input, select {
+    width: 60px;
+    padding: 4px;
+    text-align: center;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+input {
+    font-size: 16px; /* iOS 자동 확대 방지 */
+}
+.button-area {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+}
+.button-area button {
+    flex: 1;
+}
+.rank-1 { background: #fff3cd; font-weight: bold; }
+.rank-2 { background: #f1f1f1; }
+.rank-3 { background: #fdf2e9; }
+
+.ocr-box {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+}
+.ocr-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.ocr-btns button {
+    flex: 1;
+    background: #27ae60;
+}
+.ocr-btns button.reset {
+    background: #e74c3c;
+}
+.small-hint {
+    font-size: 12px;
+    color: #555;
+    margin-top: 6px;
+}
+
+@media (max-width:600px) {
+    table { font-size: 12px; }
+    input { width: 40px; }
+    select { width: 40px; }
+}
+</style>
+</head>
+<body>
+
+<h1>🏌️ 멀리건즈 대회 순위표</h1>
+
+<div class="ocr-box">
+    <h2 style="margin:0; font-size:16px;">📸 스코어카드 OCR 붙여넣기</h2>
+    <textarea id="ocrInput" placeholder="예시:
+상무형님잡자 84(+12) +12.3
+굿샷무래 66(-6) -4.8
+봄날앤싱글 85(+13) -2.2"></textarea>
+
+    <div class="ocr-btns">
+        <button onclick="applyOCR()">✅ 자동 입력</button>
+        <button class="reset" onclick="clearOCR()">🧹 OCR창 비우기</button>
+    </div>
+
+    <div class="small-hint">
+        ✔️ 자동으로 회원명 매칭 후<br>
+        - G핸디 → 핸디 칸 입력<br>
+        - Total 괄호값 → 스코어 칸 입력<br>
+        (이후 순위 계산 버튼 누르면 Net 자동 반영됨)
+    </div>
+</div>
+
+<div class="button-area">
+    <button onclick="resetRound()">🔄 대회 초기화</button>
+    <button onclick="calculate()">📊 순위 계산</button>
+</div>
+
+<table id="playerTable">
+<thead>
+<tr>
+    <th>순위</th>
+    <th>회원명</th>
+    <th>팀</th>
+    <th>G핸디</th>
+    <th>스코어</th>
+    <th>멀리건</th>
+    <th>Net</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<h2>🏆 팀 순위</h2>
+<table id="teamTable">
+<thead>
+<tr>
+    <th>순위</th>
+    <th>팀</th>
+    <th>팀 Net 합계</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+const members = [
+"곽정훈","김기태","굿샷무래","김재욱","김준우","상무형님잡자","김판교","명노욱",
+"박상용","박우민","박철수","서성하","송호준","오찬욱","이정은","이준영",
+"전진용","봄날앤싱글","최영진","황도영"];
+
+const storageKey = "golfzonTournamentData";
+
+// 초기 테이블 생성
+const tbody = document.querySelector("#playerTable tbody");
+members.forEach((name, i) => {
+    tbody.insertAdjacentHTML("beforeend", `
+    <tr data-index="${i}">
+        <td>-</td>
+        <td class="playerName">${name}</td>
+        <td>
+            <select>
+                <option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+            </select>
+        </td>
+        <td><input class="handicap" type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
+        <td><input class="score" type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
+        <td><input class="mulligan" type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
+        <td>-</td>
+    </tr>
+    `);
+});
+
+// 저장 로드
+loadData();
+
+// 자동 저장 이벤트
+document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", saveData);
+});
+
+function resetRound() {
+    const ok = confirm("팀, 스코어, 멀리건, Net을 초기화할까요?\n(핸디와 회원명은 유지됩니다)");
+
+    if (!ok) return;
+
+    const rows = [...tbody.rows];
+
+    rows.forEach(r => {
+        r.querySelector("select").value = "";
+
+        const inputs = r.querySelectorAll("input");
+
+        // 스코어 초기화
+        inputs[1].value = "";
+
+        // 멀리건 초기화
+        inputs[2].value = "";
+
+        // 순위 / Net 초기화
+        r.cells[0].textContent = "-";
+        r.cells[6].textContent = "-";
+
+        // 스타일 제거
+        r.className = "";
+    });
+
+    document.querySelector("#teamTable tbody").innerHTML = "";
+    saveData();
+}
+
+function saveData() {
+    const data = [...tbody.rows].map(r => {
+        const inputs = r.querySelectorAll("input");
+        return {
+            team: r.querySelector("select").value,
+            handicap: inputs[0].value,
+            score: inputs[1].value,
+            mulligan: inputs[2].value
+        };
+    });
+    localStorage.setItem(storageKey, JSON.stringify(data));
+}
+
+function loadData() {
+    const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    data.forEach((d, i) => {
+        const row = tbody.rows[i];
+        if (!row) return;
+        row.querySelector("select").value = d.team || "";
+        const inputs = row.querySelectorAll("input");
+        inputs[0].value = d.handicap || "";
+        inputs[1].value = d.score || "";
+        inputs[2].value = d.mulligan || "";
+    });
+}
+
+// OCR 입력창 비우기
+function clearOCR() {
+    document.getElementById("ocrInput").value = "";
+}
+
+// OCR 텍스트 파싱 후 자동 입력
+function applyOCR() {
+    const text = document.getElementById("ocrInput").value.trim();
+
+    if (!text) {
+        alert("OCR 텍스트를 먼저 붙여넣어주세요!");
+        return;
+    }
+
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+
+    let updatedCount = 0;
+    let notFoundNames = [];
+
+    lines.forEach(line => {
+        // 예시: 상무형님잡자 84(+12) +12.3
+        // 괄호값 추출 (+12, -6 등)
+        const bracketMatch = line.match(/\(([+-]?\d+)\)/);
+        const bracketValue = bracketMatch ? bracketMatch[1] : null;
+
+        // G핸디 추출 (+12.3, -4.8 등)
+        const gHandyMatch = line.match(/([+-]?\d+\.\d+)/);
+        const gHandyValue = gHandyMatch ? gHandyMatch[1] : null;
+
+        // 이름은 members 목록 중 포함되는 문자열로 찾기
+        const foundName = members.find(n => line.includes(n));
+
+        if (!foundName) {
+            notFoundNames.push(line);
+            return;
+        }
+
+        // 테이블에서 해당 row 찾기
+        const row = [...tbody.rows].find(r => r.querySelector(".playerName").textContent === foundName);
+        if (!row) return;
+
+        // 핸디(G핸디) 입력
+        if (gHandyValue !== null) {
+            row.querySelector(".handicap").value = gHandyValue;
+        }
+
+        // 스코어 칸에 괄호값 입력
+        if (bracketValue !== null) {
+            row.querySelector(".score").value = bracketValue;
+        }
+
+        updatedCount++;
+    });
+
+    saveData();
+
+    let msg = `✅ OCR 자동 입력 완료!\n\n총 ${updatedCount}명 반영됨`;
+
+    if (notFoundNames.length > 0) {
+        msg += `\n\n⚠️ 이름 매칭 실패한 줄:\n${notFoundNames.join("\n")}`;
+    }
+
+    alert(msg);
+}
+
+function calculate() {
+    const rows = [...tbody.rows];
+    const validPlayers = [];
+
+    rows.forEach(r => {
+        r.className = "";
+        r.cells[0].textContent = "-";
+        r.cells[6].textContent = "-";
+
+        const inputs = r.querySelectorAll("input");
+        const score = Number(inputs[1].value);
+
+        // 스코어 없으면 제외
+        if (!score) return;
+
+        const handicap = Number(inputs[0].value || 0);
+        const mulligan = Number(inputs[2].value || 0);
+
+        const net = score - handicap - mulligan;
+
+        validPlayers.push({
+            row: r,
+            team: r.querySelector("select").value,
+            net,
+            handicap
+        });
+    });
+
+    validPlayers.sort((a, b) => {
+        if (a.net !== b.net) {
+            return a.net - b.net;        // 1순위: Net
+        }
+        return a.handicap - b.handicap; // 2순위: 핸디 (작을수록 상위)
+    });
+
+    validPlayers.forEach((p, i) => {
+        let rankText = i + 1;
+        if (i === 0) rankText = "🥇";
+        if (i === 1) rankText = "🥈";
+        if (i === 2) rankText = "🥉";
+
+        p.row.cells[0].innerHTML = rankText;
+		p.row.cells[6].textContent = p.net.toFixed(1);
+
+        if (i === 0) p.row.classList.add("rank-1");
+        if (i === 1) p.row.classList.add("rank-2");
+        if (i === 2) p.row.classList.add("rank-3");
+    });
+
+    // 팀 순위 계산
+    const teamMap = {};
+    validPlayers.forEach(p => {
+        const team = p.team || "미지정";
+        teamMap[team] = (teamMap[team] || 0) + p.net;
+    });
+
+    const teamBody = document.querySelector("#teamTable tbody");
+    teamBody.innerHTML = Object.entries(teamMap)
+        .sort((a,b)=>a[1]-b[1])
+        .map((t,i)=>`
+            <tr>
+                <td>${i+1}</td>
+                <td>${t[0]}</td>
+				<td>${Number(t[1]).toFixed(1)}</td>
+            </tr>
+        `).join("");
+}
+</script>
+
+</body>
+</html>
