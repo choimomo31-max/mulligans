@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+  <title>멀리건즈</title>
+  <style>
+    @font-face {
+      font-family: 'EliceDigitalBaeum_Bold';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_220508@1.0/EliceDigitalBaeum_Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+    body {
+      background: linear-gradient(140deg, rgb(165,142,251), rgb(233,191,248));
+      color: rgb(127, 124, 130);
+    }
+    .isValid {
+      color: rgb(201, 201, 201);
+      text-decoration-line: line-through;
+    }
+    div {
+      font-family: 'EliceDigitalBaeum_Bold', sans-serif;
+    }
+    #studentListItem {
+      text-align: center;
+      margin : 1rem;
+      cursor: pointer; 
+    }
+    #studentListItem:hover {
+      color: gray
+    }
+    .container {
+      text-align: center;
+    }
+    #pick:hover{
+       cursor: pointer;
+       color:wheat
+    }
+    .card {
+      border-radius: 1em;
+      background-color: rgb(255, 255, 255, 0.8);
+      box-shadow: 10px 10px 10px 1px  rgba(0, 0, 0, 0.2);
+      opacity: 0.8;
+    }
+    #groupInput{
+      padding: 15px;
+      padding-left: 15px;
+      border: none;
+      width:180px;
+      height:40px;
+      font-size:15px;
+      border-radius: 1rem;
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 3px 3px 3px 1px  rgba(0, 0, 0, 0.2);
+      opacity: 0.8;
+    }
+    #absentSearch{
+      padding: 15px;
+      padding-left: 15px;
+      border: none;
+      width:150px;
+      height:15px;
+      font-size:13px;
+      border-radius: 5px;
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 3px 3px 3px 1px  rgba(0, 0, 0, 0.2);
+      opacity: 0.8;
+    }
+    #pickBtn {
+    width:100px;
+    height:30px;
+    border-radius: 5px;
+    border: none;
+    animation: gradient2 5s ease infinite;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    color: white;
+    box-shadow: 3px 3px 3px 1px  rgba(0, 0, 0, 0.2);
+    opacity: 0.8;
+    }
+    .btn-gra-anim {
+    background-size: 400% 400%;
+    animation: gradient1 5s ease infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container">
+    <!--Header-->
+    <div class="mt-5 p-5">
+      <h1 style="color: rgb(54, 48, 98);">멀리건즈 조편성</h1>
+    </div>
+    
+
+    <!--교탁 Header-->
+    <div class="d-flex justify-content-between">
+      <!--결석-->
+      <div class="d-flex flex-row justify-content-between align-items-end my-2 fs-4" style="color: rgb(102, 52, 123);">
+        <!--<div>참석 :</div>
+        <div v-for="student in absent">
+          <div class="col mx-1">{{student}}</div>
+        </div>-->
+      </div>
+      <!--Making Group-->
+      <div id="inputBox" class="mb-3 d-flex flex-row">
+        <input id="groupInput" class="text-center" placeholder="사람수 입력"
+        type="number" v-model="number" @keydown.enter="groupStudents(number)">
+      </div>
+    </div>
+	
+    <!--Student List-->
+    <div class="card">
+      <div class="d-flex flex-row mt-4">
+        <!--buttons-->
+        <div id="circles" class="col-4 d-flex flex-row">
+          <p class="ms-4" style="color:rgb(255, 95, 86)">●  </p>
+          <p class="mx-2" style="color:rgb(255, 189, 46)">●  </p>
+          <p style="color:rgb(39, 201, 63)">●</p>
+        </div>
+        <!--Student List Header-->
+        <div class="fs-3 col-4 card-title m-2 me-auto" style="color:rgb(102, 52, 123)">회원 리스트</div>
+        <!--<div class="col-2">
+          <input id="absentSearch" type="text" class="text-center" placeholder="참석 회원은 누구?" v-model="student" @keydown.enter="toggleStudent(student)">
+        </div>-->
+      </div>
+      <p>참석한 회원 이름 클릭</p>
+      <!--students-->
+      <div class="row m-5">
+        <div class="col-3" v-for="student in students" style='padding 0;'>
+          <div id="studentListItem"
+          :class="{ isValid : !student.isValid }"
+          @click="toggleStudent(student.name)"
+          data-bs-toggle="tooltip" data-bs-placement="top" title="회원 참석시 클릭하세요!"
+          style='margin: 0;'>{{student.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+	<br>
+    
+    <!--Group Card-->
+    <transition v-if="dugudugu"
+      name="custom-classes-transition"
+      enter-active-class="animated tada"></transition>
+    <div class="row">
+      <div class="col-sm-6 col-lg-4 my-4" v-for="(group,idx) in myGroups">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row mb-2">
+              <!--buttons-->
+              <div id="circles" class="col-4 d-flex flex-row">
+                <div class="col-2 m-0" style="color:rgb(255, 95, 86)">●  </div>
+                <div class="col-2 m-0" style="color:rgb(255, 189, 46)">●  </div>
+                <div class="col-2 m-0" style="color:rgb(39, 201, 63)">●</div>
+              </div>
+              <!--Group Header-->
+              <div class="col-4 card-title" style="color:rgb(102, 52, 123)">Group-{{idx+1}}</div>
+              <div class="col-4"></div>
+            </div>
+            <!--Group List-->
+            <div class="m-2">
+              <p class="m-3" style="color:rgb(127, 124, 130)"v-for="student in group">{{student}}</d>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </transition>
+    <br><br><br>
+    <div class="text-light d-flex flex-row-reverse">멀리건즈</div>
+    <br><br>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        students: [{name: '곽정훈', isValid: false},
+		{name: '김기태', isValid: false},
+        {name: '김무래', isValid: false},
+        {name: '김재욱', isValid: false},
+        {name: '김준우', isValid: false},
+		{name: '김태운', isValid: false},
+		{name: '김판교', isValid: false},
+		{name: '명노욱', isValid: false},
+        {name: '박상용', isValid: false},
+        {name: '박우민', isValid: false},
+        {name: '박철수', isValid: false},
+        {name: '서성하', isValid: false},
+        {name: '송호준', isValid: false},
+        {name: '오찬욱', isValid: false},
+        {name: '이정은', isValid: false},
+        {name: '이준영', isValid: false},
+        {name: '전진용', isValid: false},
+        {name: '진상무', isValid: false},
+        {name: '최영진', isValid: false},
+        {name: '황도영', isValid: false},
+        {name: '공석1', isValid: false},
+        {name: '공석2', isValid: false},
+        {name: '공석3', isValid: false},
+        {name: '공석4', isValid: false},],
+        student : '',
+        number: '',
+        myGroups: [],
+        choseGroup: '',
+        choseMember: '',
+        loading: false,
+        finished: false,
+        absent: [],
+        dugudugu: true,
+        beforeIcon: 'fa-2x fa-solid fa-face-smile flex-row-reverse',
+        activeColor: 'rgb(127, 124, 130)',
+      },
+      methods: {
+        // 안 온 회원 비활성화(그룹에 포함X)
+        toggleStudent(student){
+          //if (confirm('그룹이 재설정됩니다. 계속 하시겠습니까?')){
+            // isValid 속성 값 바꾸기 
+            this.students[this.students.findIndex(obj =>obj.name === student)].isValid= !this.students[this.students.findIndex(obj => obj.name === student)].isValid
+            // Local Group data 초기화 / vue myGroups을 1인 그룹으로 만들어주기
+            window.localStorage.clear()
+            this.soloGroup()
+            // 결석 리스트 고쳐주기
+            if (this.absent === null || this.absent.indexOf(student) === -1){
+              this.absent.push(student)
+            }
+            else {
+              let indexAbsent = this.absent.indexOf(student)
+              this.absent.splice(indexAbsent, 1)
+            }
+          //}
+        },
+        // 랜덤 그룹 뽑기
+        groupStudents(number){
+          // loading 화면 조작
+          if (number != "" & this.loading != true & this.finished != true) {
+          this.loading = true
+
+          var that = this;
+          setTimeout(function() {
+              that.loading = false;
+              that.finished = true;
+            }, 3000);
+
+          var like = this;
+          setTimeout(function() {
+              like.finished = false;
+            }, 6000);
+
+          // isValid가 true인 회원들만 그룹지어 만들어준다.
+          const vaildStudent = this.students.filter(student => {
+            return student.isValid
+          }).map(student => student.name)
+          for (let i = 1; i <= 10; i++) {
+            setTimeout((i) => {
+              const randomStudent = _.shuffle(vaildStudent)
+			  const group = _.chunk(randomStudent, number)
+			  this.myGroups = _.shuffle(group)
+              // LocalStorage에 생성한 Group을 저장해준다.
+              const jsonData = JSON.stringify(this.myGroups)
+              window.localStorage.setItem('myGroups', jsonData)
+            }, i * 250);
+          }
+          this.choseMember = false
+          this.number = '' 
+        }
+        },
+        // 그룹 초기화(1인 그룹)
+        soloGroup(){
+          const vaildStudent = this.students.filter(student => {
+            return student.isValid
+          }).map(student => student.name)
+          const group = _.chunk(vaildStudent, 1)
+          this.myGroups = group
+        },
+        // 랜덤 조뽑기
+        randomGroup(){
+          this.dugudugu = !this.dugudugu
+          this.choseGroup = _.random(1,this.myGroups.length)
+          // 인덱스는 0부터 시작하므로 편의를 위해 1 빼주기
+          this.choseGroup -= 1
+          this.randomGroupMember()
+        },
+        // 랜덤 사람 뽑기
+        randomGroupMember(){
+          // 그룹 없이 뽑는 경우 / 1명씩 그룹에서 뽑는 경우 / 1그룹만 만들고 뽑는 경우
+          if ( !this.myGroups || this.myGroups[0].length === 1 || this.myGroups.length === 1 ){
+            this.choseMember = _.random(1,this.students.length)
+            this.choseMember = this.students[this.choseMember-1].name;
+          }
+          else {
+            this.choseMember = _.random(this.myGroups[this.choseGroup].length-1)
+            this.choseMember = this.myGroups[this.choseGroup][this.choseMember]
+          }
+        },
+        // 랜덤 조 + 랜덤 조 발표자 뽑기
+        randomPick(){
+          for (let i = 1; i <= 10; i++) {
+            setTimeout((i) => {
+              this.randomGroup()
+            }, i * 250);
+          }
+          setTimeout(() => {
+            this.activeColor = 'rgb(255, 95, 86)'
+          }, 3000)
+          setTimeout(() => {
+            this.activeColor = 'rgb(127, 124, 130)'
+          }, 6000)
+          
+        },
+      },
+      created() {
+        // LocalStorage의 MyGroup을 가져와준다.
+        const groups = window.localStorage.getItem('myGroups')
+        this.myGroups = JSON.parse(groups)
+        if (!this.myGroups){
+          this.soloGroup()
+        }
+        }        
+    })
+  </script>
+</body>
+
+</html>
