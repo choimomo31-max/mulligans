@@ -103,14 +103,15 @@ textarea {
 <h1>🏌️ 멀리건즈 대회 순위표</h1>
 
 <div class="ocr-box">
-    <h2 style="margin:0; font-size:16px;">📸 스코어카드 OCR 붙여넣기</h2>
+    <h2 style="margin:0; font-size:16px;">📸 스코어카드 OCR (사진촬영 지원)</h2>
     <textarea id="ocrInput" placeholder="예시:
 상무형님잡자 84(+12) +12.3
 굿샷무래 66(-6) -4.8
 봄날앤싱글 85(+13) -2.2"></textarea>
 
     <div class="ocr-btns">
-        <button onclick="applyOCR()">✅ 자동 입력</button>
+        <button onclick="runCameraOCR()">📸 사진촬영 OCR 실행</button>
+        <button onclick="applyOCR()">✅ OCR 텍스트 자동 입력</button>
         <button class="reset" onclick="clearOCR()">🧹 OCR창 비우기</button>
     </div>
 
@@ -154,6 +155,7 @@ textarea {
 <tbody></tbody>
 </table>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 const members = [
 "곽정훈","김기태","굿샷무래","김재욱","김준우","상무형님잡자","김판교","명노욱",
@@ -247,6 +249,59 @@ function loadData() {
 }
 
 // OCR 입력창 비우기
+
+function setProgress(pct) {
+    pct = Math.max(0, Math.min(100, pct));
+    const t = document.getElementById("progressText");
+    const f = document.getElementById("progressFill");
+    if (t) t.textContent = pct + "%";
+    if (f) f.style.width = pct + "%";
+}
+
+// 카메라 촬영/업로드 이미지 OCR 실행
+async function runCameraOCR() {
+    const input = document.getElementById("cameraInput");
+    if (!input || !input.files || input.files.length === 0) {
+        alert("먼저 스코어카드 사진을 촬영(또는 선택)해주세요!");
+        return;
+    }
+
+    const file = input.files[0];
+    setProgress(0);
+
+    const ocrBox = document.getElementById("ocrInput");
+    if (ocrBox) ocrBox.value = "OCR 실행 중... 잠시만 기다려주세요.";
+
+    try {
+        const result = await Tesseract.recognize(
+            file,
+            "kor+eng",
+            {
+                logger: m => {
+                    if (m.status === "recognizing text") {
+                        const pct = Math.floor((m.progress || 0) * 100);
+                        setProgress(pct);
+                    }
+                }
+            }
+        );
+
+        setProgress(100);
+        if (ocrBox) ocrBox.value = result.data.text;
+
+        // OCR 끝나면 자동으로 applyOCR 실행
+        applyOCR();
+
+        alert("✅ OCR 완료 + 자동 입력 완료!");
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ OCR 실패! (브라우저 콘솔 확인)");
+        if (ocrBox) ocrBox.value = "";
+        setProgress(0);
+    }
+}
+
 function clearOCR() {
     document.getElementById("ocrInput").value = "";
 }
