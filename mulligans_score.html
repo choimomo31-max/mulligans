@@ -119,9 +119,9 @@ members.forEach((name, i) => {
                 <option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
             </select>
         </td>
-        <td><input type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
-        <td><input type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
-        <td><input type="text" inputmode="numeric" pattern="-?[0-9]*"></td>
+        <td><input type="text" inputmode="decimal" pattern="[0-9\\-\\.]*"></td>
+        <td><input type="text" inputmode="decimal" pattern="[0-9\\-\\.]*"></td>
+        <td><input type="text" inputmode="decimal" pattern="[0-9\\-\\.]*"></td>
         <td>-</td>
     </tr>
     `);
@@ -235,7 +235,7 @@ function calculate() {
         if (i === 2) rankText = "🥉";
 
         p.row.cells[0].innerHTML = rankText;
-        p.row.cells[6].textContent = p.net.toFixed(1);
+		p.row.cells[6].textContent = p.net.toFixed(1);
 
         if (i === 0) p.row.classList.add("rank-1");
         if (i === 1) p.row.classList.add("rank-2");
