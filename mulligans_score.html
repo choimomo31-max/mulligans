@@ -235,7 +235,7 @@ function calculate() {
         if (i === 2) rankText = "🥉";
 
         p.row.cells[0].innerHTML = rankText;
-        p.row.cells[6].textContent = p.net;
+        p.row.cells[6].textContent = p.net.toFixed(1);
 
         if (i === 0) p.row.classList.add("rank-1");
         if (i === 1) p.row.classList.add("rank-2");
@@ -255,7 +255,7 @@ function calculate() {
             <tr>
                 <td>${i+1}</td>
                 <td>${t[0]}</td>
-                <td>${t[1]}</td>
+				<td>${Number(t[1]).toFixed(1)}</td>
             </tr>
         `).join("");
 }
