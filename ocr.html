@@ -2,36 +2,42 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>이미지 OCR 값 추출</title>
+<title>아이디별 점수 추출</title>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 <style>
-  body { font-family: Arial; padding: 20px; }
-  img { max-width: 300px; margin-top: 10px; }
-  .result { margin-top: 20px; font-size: 18px; }
+  body { font-family: Arial; padding:20px; }
+  img { max-width:300px; margin-top:10px; }
+  table { margin-top:20px; border-collapse: collapse; }
+  th, td { border:1px solid #ccc; padding:8px; }
 </style>
 </head>
 <body>
 
-<h2>이미지에서 PAR / G핸디 / Total 읽기</h2>
+<h2>아이디별 Total / G핸디 추출</h2>
 
 <input type="file" id="imageInput" accept="image/*">
 <br>
 <img id="preview">
 
-<div class="result">
-  <p>PAR: <span id="parValue">-</span></p>
-  <p>G핸디: <span id="ghandiValue">-</span></p>
-  <p>Total: <span id="totalValue">-</span></p>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>아이디</th>
+      <th>Total</th>
+      <th>G핸디</th>
+    </tr>
+  </thead>
+  <tbody id="resultBody"></tbody>
+</table>
 
 <script>
 document.getElementById('imageInput').addEventListener('change', function(e) {
+
   const file = e.target.files[0];
   const reader = new FileReader();
 
   reader.onload = function(event) {
-    const img = document.getElementById('preview');
-    img.src = event.target.result;
+    document.getElementById('preview').src = event.target.result;
 
     Tesseract.recognize(
       event.target.result,
@@ -39,17 +45,45 @@ document.getElementById('imageInput').addEventListener('change', function(e) {
       { logger: m => console.log(m) }
     ).then(({ data: { text } }) => {
 
-      console.log("OCR 전체 텍스트:", text);
+      console.log("OCR 원본:", text);
 
-      // 정규식으로 값 추출
-      const parMatch = text.match(/PAR\s*[:\-]?\s*(\d+)/i);
-      const ghandiMatch = text.match(/G핸디\s*[:\-]?\s*(\d+)/i);
-      const totalMatch = text.match(/Total\s*[:\-]?\s*(\d+)/i);
+      const lines = text.split('\n');
+      const resultBody = document.getElementById('resultBody');
+      resultBody.innerHTML = "";
 
-      document.getElementById('parValue').innerText = parMatch ? parMatch[1] : "찾을 수 없음";
-      document.getElementById('ghandiValue').innerText = ghandiMatch ? ghandiMatch[1] : "찾을 수 없음";
-      document.getElementById('totalValue').innerText = totalMatch ? totalMatch[1] : "찾을 수 없음";
+      lines.forEach(line => {
+
+        // 아이디 포함된 줄만 처리 (숫자 많이 포함된 줄)
+        if (line.match(/[가-힣A-Za-z]/) && line.match(/\d/)) {
+
+          // 모든 숫자 추출
+          const numbers = line.match(/[-+]?\d+(\.\d+)?/g);
+
+          if (numbers && numbers.length >= 2) {
+
+            const total = numbers[numbers.length - 2];
+            const ghandi = numbers[numbers.length - 1];
+
+            // 아이디는 숫자 앞 텍스트 부분
+            const nameMatch = line.match(/[가-힣A-Za-z\[\]]+/);
+            const name = nameMatch ? nameMatch[0] : "Unknown";
+
+            const row = `
+              <tr>
+                <td>${name}</td>
+                <td>${total}</td>
+                <td>${ghandi}</td>
+              </tr>
+            `;
+
+            resultBody.innerHTML += row;
+          }
+        }
+
+      });
+
     });
+
   };
 
   reader.readAsDataURL(file);
