@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>모바일 실시간 OCR</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<style>
+  body { font-family: Arial; text-align: center; padding: 10px; }
+  video, canvas { width: 100%; max-width: 400px; border-radius: 10px; }
+  button {
+    padding: 12px 20px;
+    font-size: 18px;
+    margin-top: 10px;
+    border: none;
+    background: #2c7be5;
+    color: white;
+    border-radius: 8px;
+  }
+  .result { margin-top: 15px; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<h2>📷 PAR / G핸디 / Total 실시간 인식</h2>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<br>
+<button onclick="captureAndRecognize()">📸 인식하기</button>
+
+<div class="result">
+  <p>PAR: <span id="parValue">-</span></p>
+  <p>G핸디: <span id="ghandiValue">-</span></p>
+  <p>Total: <span id="totalValue">-</span></p>
+</div>
+
+<script>
+const video = document.getElementById('video');
+
+// 📷 카메라 실행
+navigator.mediaDevices.getUserMedia({
+  video: { facingMode: "environment" }
+})
+.then(stream => {
+  video.srcObject = stream;
+})
+.catch(err => {
+  alert("카메라 접근 실패: " + err);
+});
+
+function captureAndRecognize() {
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const imageData = canvas.toDataURL('image/png');
+
+  Tesseract.recognize(
+    imageData,
+    'kor+eng',
+    { logger: m => console.log(m) }
+  ).then(({ data: { text } }) => {
+
+    console.log("OCR 결과:", text);
+
+    const parMatch = text.match(/PAR\s*[:\-]?\s*(\d+)/i);
+    const ghandiMatch = text.match(/G핸디\s*[:\-]?\s*(\d+)/i);
+    const totalMatch = text.match(/Total\s*[:\-]?\s*(\d+)/i);
+
+    document.getElementById('parValue').innerText = parMatch ? parMatch[1] : "찾을 수 없음";
+    document.getElementById('ghandiValue').innerText = ghandiMatch ? ghandiMatch[1] : "찾을 수 없음";
+    document.getElementById('totalValue').innerText = totalMatch ? totalMatch[1] : "찾을 수 없음";
+  });
+}
+</script>
+
+</body>
+</html>
