@@ -2,31 +2,60 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영역 잘라서 OCR</title>
+<title>가이드 박스 OCR</title>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 <style>
-  body { text-align:center; font-family:Arial; }
-  video { width:100%; max-width:400px; border-radius:10px; }
+  body { margin:0; font-family:Arial; text-align:center; background:#111; color:white;}
+  .camera-wrapper {
+    position:relative;
+    width:100%;
+    max-width:400px;
+    margin:auto;
+  }
+  video {
+    width:100%;
+    border-radius:12px;
+  }
+  .guide {
+    position:absolute;
+    left:10%;
+    width:80%;
+    border:3px solid #00ff88;
+    border-radius:8px;
+    box-sizing:border-box;
+  }
+  #parBox { top:60%; height:8%; }
+  #ghandiBox { top:70%; height:8%; }
+  #totalBox { top:80%; height:10%; border-color:#ffcc00; }
+
   button {
+    margin-top:15px;
     padding:12px 20px;
     font-size:18px;
-    margin-top:10px;
-    background:#28a745;
-    color:white;
+    background:#00c853;
     border:none;
     border-radius:8px;
+    color:white;
   }
+
   .result { margin-top:15px; font-size:18px; }
 </style>
 </head>
 <body>
 
-<h2>📷 고정 영역 OCR</h2>
+<h3>📷 가이드 박스 맞춰서 인식</h3>
 
-<video id="video" autoplay playsinline></video>
+<div class="camera-wrapper">
+  <video id="video" autoplay playsinline></video>
+
+  <!-- 가이드 박스 -->
+  <div id="parBox" class="guide"></div>
+  <div id="ghandiBox" class="guide"></div>
+  <div id="totalBox" class="guide"></div>
+</div>
+
 <canvas id="canvas" style="display:none;"></canvas>
 
-<br>
 <button onclick="capture()">📸 인식하기</button>
 
 <div class="result">
@@ -52,20 +81,22 @@ function capture() {
   canvas.height = video.videoHeight;
   ctx.drawImage(video, 0, 0);
 
-  // 🔥 고정 영역 좌표 (비율 기준)
   const w = canvas.width;
   const h = canvas.height;
 
-  const parArea = ctx.getImageData(w*0.1, h*0.6, w*0.8, h*0.08);
-  const ghandiArea = ctx.getImageData(w*0.1, h*0.7, w*0.8, h*0.08);
-  const totalArea = ctx.getImageData(w*0.1, h*0.8, w*0.8, h*0.1);
+  // 가이드 박스 위치와 동일한 비율
+  const areas = {
+    par: ctx.getImageData(w*0.1, h*0.6, w*0.8, h*0.08),
+    ghandi: ctx.getImageData(w*0.1, h*0.7, w*0.8, h*0.08),
+    total: ctx.getImageData(w*0.1, h*0.8, w*0.8, h*0.1)
+  };
 
-  recognizeArea(parArea, "parValue", /(\d+)/);
-  recognizeArea(ghandiArea, "ghandiValue", /(\d+)/);
-  recognizeArea(totalArea, "totalValue", /(\d+)/);
+  recognize(areas.par, "parValue");
+  recognize(areas.ghandi, "ghandiValue");
+  recognize(areas.total, "totalValue");
 }
 
-function recognizeArea(imageData, elementId, regex) {
+function recognize(imageData, elementId) {
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = imageData.width;
   tempCanvas.height = imageData.height;
@@ -78,10 +109,9 @@ function recognizeArea(imageData, elementId, regex) {
       tessedit_char_whitelist: '0123456789'
     }
   ).then(({ data: { text } }) => {
-    const clean = text.replace(/\s/g,'');
-    const match = clean.match(regex);
+    const clean = text.replace(/\D/g,'');
     document.getElementById(elementId).innerText =
-      match ? match[1] : "찾을 수 없음";
+      clean.length ? clean : "찾을 수 없음";
   });
 }
 </script>
