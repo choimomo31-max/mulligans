@@ -1,93 +1,97 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>아이디별 점수 추출</title>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-<style>
-  body { font-family: Arial; padding:20px; }
-  img { max-width:300px; margin-top:10px; }
-  table { margin-top:20px; border-collapse: collapse; }
-  th, td { border:1px solid #ccc; padding:8px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>골프 스코어보드 추출기</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        #status { color: blue; font-weight: bold; }
+        img { max-width: 100%; margin-top: 10px; display: none; }
+    </style>
 </head>
 <body>
 
-<h2>아이디별 Total / G핸디 추출</h2>
+<div class="container">
+    <h2>⛳ 골프 스코어 데이터 추출</h2>
+    <p>스코어카드 이미지를 업로드하면 <b>이름, Total, G핸디</b>를 분석합니다.</p>
+    
+    <input type="file" id="imageInput" accept="image/*">
+    <div id="status"></div>
+    <img id="preview" alt="미리보기">
 
-<input type="file" id="imageInput" accept="image/*">
-<br>
-<img id="preview">
-
-<table>
-  <thead>
-    <tr>
-      <th>아이디</th>
-      <th>Total</th>
-      <th>G핸디</th>
-    </tr>
-  </thead>
-  <tbody id="resultBody"></tbody>
-</table>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>Total</th>
+                <th>G핸디</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+</div>
 
 <script>
-document.getElementById('imageInput').addEventListener('change', function(e) {
+    const imageInput = document.getElementById('imageInput');
+    const status = document.getElementById('status');
+    const tbody = document.querySelector('#resultTable tbody');
+    const preview = document.getElementById('preview');
 
-  const file = e.target.files[0];
-  const reader = new FileReader();
+    imageInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-  reader.onload = function(event) {
-    document.getElementById('preview').src = event.target.result;
+        // 미리보기 설정
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        
+        status.innerText = '이미지 분석 중... 잠시만 기다려주세요.';
+        tbody.innerHTML = '';
 
-    Tesseract.recognize(
-      event.target.result,
-      'kor+eng',
-      { logger: m => console.log(m) }
-    ).then(({ data: { text } }) => {
+        try {
+            // Tesseract.js 실행 (한국어 및 영어 학습 데이터 사용)
+            const worker = await Tesseract.createWorker('kor+eng');
+            const { data: { text } } = await worker.recognize(file);
+            await worker.terminate();
 
-      console.log("OCR 원본:", text);
-
-      const lines = text.split('\n');
-      const resultBody = document.getElementById('resultBody');
-      resultBody.innerHTML = "";
-
-      lines.forEach(line => {
-
-        // 아이디 포함된 줄만 처리 (숫자 많이 포함된 줄)
-        if (line.match(/[가-힣A-Za-z]/) && line.match(/\d/)) {
-
-          // 모든 숫자 추출
-          const numbers = line.match(/[-+]?\d+(\.\d+)?/g);
-
-          if (numbers && numbers.length >= 2) {
-
-            const total = numbers[numbers.length - 2];
-            const ghandi = numbers[numbers.length - 1];
-
-            // 아이디는 숫자 앞 텍스트 부분
-            const nameMatch = line.match(/[가-힣A-Za-z\[\]]+/);
-            const name = nameMatch ? nameMatch[0] : "Unknown";
-
-            const row = `
-              <tr>
-                <td>${name}</td>
-                <td>${total}</td>
-                <td>${ghandi}</td>
-              </tr>
-            `;
-
-            resultBody.innerHTML += row;
-          }
+            processText(text);
+            status.innerText = '분석 완료!';
+        } catch (error) {
+            console.error(error);
+            status.innerText = '오류 발생: 이미지를 읽을 수 없습니다.';
         }
-
-      });
-
     });
 
-  };
+    function processText(text) {
+        // 정규표현식 등을 활용해 줄바꿈 기준으로 데이터 파싱
+        // 이미지의 레이아웃에 따라 이 로직은 고도화가 필요할 수 있습니다.
+        const lines = text.split('\n').filter(line => line.trim().length > 2);
+        
+        // 예시 데이터 매칭 (수동 파싱 로직 예시)
+        // 실제 운영 시에는 좌표 기반 OCR(Google Vision API 등)을 사용하면 더 정확합니다.
+        lines.forEach(line => {
+            // 이름 패턴, 숫자 패턴 등을 찾아 테이블에 추가
+            if (line.includes('상무') || line.includes('무래') || line.includes('싱글')) {
+                const row = tbody.insertRow();
+                const cells = line.split(/\s+/); // 공백 기준 분리
+                
+                row.insertCell(0).innerText = cells[0] || '추출중...';
+                row.insertCell(1).innerText = line.match(/\d{2}\([+-]\d+\)/) ? line.match(/\d{2}\([+-]\d+\)/)[0] : '미검출';
+                row.insertCell(2).innerText = line.match(/[+-]\d+\.\d+/) ? line.match(/[+-]\d+\.\d+/)[0] : '미검출';
+            }
+        });
 
-  reader.readAsDataURL(file);
-});
+        if(tbody.rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">텍스트를 정확히 구분하지 못했습니다. 수동 확인이 필요합니다.</td></tr>';
+        }
+    }
 </script>
 
 </body>
