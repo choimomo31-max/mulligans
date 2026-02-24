@@ -119,9 +119,9 @@ members.forEach((name, i) => {
                 <option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
             </select>
         </td>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
+        <td><input type="text" inputmode="decimal" pattern="-?[0-9]*"></td>
+        <td><input type="text" inputmode="decimal" pattern="-?[0-9]*"></td>
+        <td><input type="text" inputmode="decimal" pattern="-?[0-9]*"></td>
         <td>-</td>
     </tr>
     `);
@@ -131,8 +131,17 @@ members.forEach((name, i) => {
 loadData();
 
 // 자동 저장 이벤트
+/*
 document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", saveData);
+});
+*/
+document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", function() {
+        saveData();
+        const row = this.closest("tr");
+        if (row) calculateRowNet(row);
+    });
 });
 
 function resetRound() {
@@ -204,21 +213,37 @@ function calculate() {
         r.cells[0].textContent = "-";
         r.cells[6].textContent = "-";
 
-        const inputs = r.querySelectorAll("input");
-        const score = Number(inputs[1].value);
-
-        // 👉 스코어 없으면 제외
+        const inputs = r.querySelectorAll("input");       
+		/*
+		const score = Number(inputs[1].value);
+		// 👉 스코어 없으면 제외
         if (!score) return;
+		*/
+		
+		const scoreValue = inputs[1].value;
+
+		// 👉 스코어가 빈값("")일 때만 제외
+		if (scoreValue === "") return;
+		
+		const score = Number(scoreValue);
 
         const handicap = Number(inputs[0].value || 0);
         const mulligan = Number(inputs[2].value || 0);
         const net = score - handicap - mulligan;
-
+		
+		/*
         validPlayers.push({
             row: r,
             team: r.querySelector("select").value,
             net
         });
+		*/
+		validPlayers.push({
+			row: r,
+		    team: r.querySelector("select").value,
+		    net,
+		    handicap
+		});
     });
 
     validPlayers.sort((a, b) => {
@@ -258,6 +283,26 @@ function calculate() {
 				<td>${Number(t[1]).toFixed(1)}</td>
             </tr>
         `).join("");
+}
+
+function calculateRowNet(row) {
+    const inputs = row.querySelectorAll("input");
+
+    const scoreValue = inputs[1].value;
+
+    // 스코어가 비어있으면 Net 표시 안 함
+    if (scoreValue === "") {
+        row.cells[6].textContent = "-";
+        return;
+    }
+
+    const score = Number(scoreValue);
+    const handicap = Number(inputs[0].value || 0);
+    const mulligan = Number(inputs[2].value || 0);
+
+    const net = score - handicap - mulligan;
+
+    row.cells[6].textContent = net.toFixed(1);
 }
 </script>
 
