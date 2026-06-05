@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멀리건즈 골프 동호회 회원주소록</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #1e5631;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1e5631;
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .search-box {
+            padding: 8px 12px;
+            width: 220px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 10px;
+        }
+        th {
+            background-color: #1e5631;
+            color: white;
+            font-weight: 600;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        tr:hover {
+            background-color: #f9fbf9;
+        }
+        
+        @media screen and (max-width: 600px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                padding: 10px;
+                background: #fff;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 45%;
+                text-align: right;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+            td:before {
+                position: absolute;
+                top: 12px;
+                left: 15px;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #1e5631;
+                content: attr(data-label);
+            }
+            .meta-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>⛳ 멀리건즈 골프 동호회 회원주소록</h1>
+        <p>Mulligans Golf Club Member Directory</p>
+    </div>
+
+    <div class="meta-info">
+        <div><strong>총 회원수:</strong> 22명</div>
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="이름 검색...">
+    </div>
+
+    <table id="memberTable">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>이름</th>
+                <th>핸드폰번호</th>
+                <th>출생년도</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-label="번호">1</td>
+                <td data-label="이름">곽정훈</td>
+                <td data-label="핸드폰번호">010-2036-9412</td>
+                <td data-label="출생년도">1978년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">2</td>
+                <td data-label="이름">김기태</td>
+                <td data-label="핸드폰번호">010-6754-1033</td>
+                <td data-label="출생년도">1977년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">3</td>
+                <td data-label="이름">김무래</td>
+                <td data-label="핸드폰번호">010-2661-5817</td>
+                <td data-label="출생년도">1973년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">4</td>
+                <td data-label="이름">김병철</td>
+                <td data-label="핸드폰번호">010-7917-8114</td>
+                <td data-label="출생년도">1981년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">5</td>
+                <td data-label="이름">김재욱</td>
+                <td data-label="핸드폰번호">010-9262-6128</td>
+                <td data-label="출생년도">1979년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">6</td>
+                <td data-label="이름">김준우</td>
+                <td data-label="핸드폰번호">010-8748-3709</td>
+                <td data-label="출생년도">1970년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">7</td>
+                <td data-label="이름">김진성</td>
+                <td data-label="핸드폰번호">010-6328-6969</td>
+                <td data-label="출생년도">1975년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">8</td>
+                <td data-label="이름">김태운</td>
+                <td data-label="핸드폰번호">010-6300-3939</td>
+                <td data-label="출생년도">1986년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">9</td>
+                <td data-label="이름">김판교</td>
+                <td data-label="핸드폰번호">010-6296-2596</td>
+                <td data-label="출생년도">1969년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">10</td>
+                <td data-label="이름">명노욱</td>
+                <td data-label="핸드폰번호">010-3354-4158</td>
+                <td data-label="출생년도">1978년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">11</td>
+                <td data-label="이름">박상용</td>
+                <td data-label="핸드폰번호">010-2484-8972</td>
+                <td data-label="출생년도">1972년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">12</td>
+                <td data-label="이름">박우민</td>
+                <td data-label="핸드폰번호">010-6316-4796</td>
+                <td data-label="출생년도">1985년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">13</td>
+                <td data-label="이름">박철수</td>
+                <td data-label="핸드폰번호">010-6342-8872</td>
+                <td data-label="출생년도">1977년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">14</td>
+                <td data-label="이름">서성하</td>
+                <td data-label="핸드폰번호">010-3701-7004</td>
+                <td data-label="출생년도">1970년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">15</td>
+                <td data-label="이름">송호준</td>
+                <td data-label="핸드폰번호">010-3224-7299</td>
+                <td data-label="출생년도">1973년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">16</td>
+                <td data-label="이름">오찬욱</td>
+                <td data-label="핸드폰번호">010-4745-1577</td>
+                <td data-label="출생년도">1972년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">17</td>
+                <td data-label="이름">이정은</td>
+                <td data-label="핸드폰번호">010-9750-2084</td>
+                <td data-label="출생년도">1980년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">18</td>
+                <td data-label="이름">이준영</td>
+                <td data-label="핸드폰번호">010-5755-5856</td>
+                <td data-label="출생년도">1969년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">19</td>
+                <td data-label="이름">전진용</td>
+                <td data-label="핸드폰번호">010-5910-7673</td>
+                <td data-label="출생년도">1969년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">20</td>
+                <td data-label="이름">진상무</td>
+                <td data-label="핸드폰번호">010-6723-5098</td>
+                <td data-label="출생년도">1979년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">21</td>
+                <td data-label="이름">최영진</td>
+                <td data-label="핸드폰번호">010-8861-4291</td>
+                <td data-label="출생년도">1973년</td>
+            </tr>
+            <tr>
+                <td data-label="번호">22</td>
+                <td data-label="이름">황도영</td>
+                <td data-label="핸드폰번호">010-6337-7129</td>
+                <td data-label="출생년도">1968년</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("memberTable");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1]; // 이름 컬럼 기준 검색
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+</body>
+</html>
