@@ -73,6 +73,31 @@
         tr:hover {
             background-color: #f9fbf9;
         }
+
+        /* 연락처 클릭 및 액션 버튼 스타일 추가 */
+        .phone-number {
+            color: #1e5631;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .action-menu {
+            display: none;
+            margin-top: 5px;
+            gap: 5px;
+        }
+        .action-btn {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-call { background-color: #2ecc71; }
+        .btn-sms { background-color: #3498db; }
+        .btn-talk { background-color: #f1c40f; color: #333; }
         
         @media screen and (max-width: 600px) {
             table, thead, tbody, th, td, tr {
@@ -120,6 +145,9 @@
             .search-box {
                 width: 100%;
             }
+            .action-menu {
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
@@ -127,7 +155,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>⛳ 멀리건즈 골프 동호회 회원주소록</h1>
+        <h1>⛳ 멀리건즈 회원주소록</h1>
         <p>Mulligans Golf Club Member Directory</p>
     </div>
 
@@ -149,133 +177,287 @@
             <tr>
                 <td data-label="번호">1</td>
                 <td data-label="이름">곽정훈</td>
-                <td data-label="핸드폰번호">010-2036-9412</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-2036-9412</span>
+                    <div class="action-menu">
+                        <a href="tel:010-2036-9412" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-2036-9412" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다. 상대방 검색은 카카오톡 내에서 진행해 주세요.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1978년</td>
             </tr>
             <tr>
                 <td data-label="번호">2</td>
                 <td data-label="이름">김기태</td>
-                <td data-label="핸드폰번호">010-6754-1033</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6754-1033</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6754-1033" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6754-1033" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1977년</td>
             </tr>
             <tr>
                 <td data-label="번호">3</td>
                 <td data-label="이름">김무래</td>
-                <td data-label="핸드폰번호">010-2661-5817</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-2661-5817</span>
+                    <div class="action-menu">
+                        <a href="tel:010-2661-5817" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-2661-5817" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1973년</td>
             </tr>
             <tr>
                 <td data-label="번호">4</td>
                 <td data-label="이름">김병철</td>
-                <td data-label="핸드폰번호">010-7917-8114</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-7917-8114</span>
+                    <div class="action-menu">
+                        <a href="tel:010-7917-8114" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-7917-8114" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1981년</td>
             </tr>
             <tr>
                 <td data-label="번호">5</td>
                 <td data-label="이름">김재욱</td>
-                <td data-label="핸드폰번호">010-9262-6128</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-9262-6128</span>
+                    <div class="action-menu">
+                        <a href="tel:010-9262-6128" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-9262-6128" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1979년</td>
             </tr>
             <tr>
                 <td data-label="번호">6</td>
                 <td data-label="이름">김준우</td>
-                <td data-label="핸드폰번호">010-8748-3709</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-8748-3709</span>
+                    <div class="action-menu">
+                        <a href="tel:010-8748-3709" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-8748-3709" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1970년</td>
             </tr>
             <tr>
                 <td data-label="번호">7</td>
                 <td data-label="이름">김진성</td>
-                <td data-label="핸드폰번호">010-6328-6969</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6328-6969</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6328-6969" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6328-6969" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1975년</td>
             </tr>
             <tr>
                 <td data-label="번호">8</td>
                 <td data-label="이름">김태운</td>
-                <td data-label="핸드폰번호">010-6300-3939</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6300-3939</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6300-3939" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6300-3939" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1986년</td>
             </tr>
             <tr>
                 <td data-label="번호">9</td>
                 <td data-label="이름">김판교</td>
-                <td data-label="핸드폰번호">010-6296-2596</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6296-2596</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6296-2596" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6296-2596" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1969년</td>
             </tr>
             <tr>
                 <td data-label="번호">10</td>
                 <td data-label="이름">명노욱</td>
-                <td data-label="핸드폰번호">010-3354-4158</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-3354-4158</span>
+                    <div class="action-menu">
+                        <a href="tel:010-3354-4158" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-3354-4158" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1978년</td>
             </tr>
             <tr>
                 <td data-label="번호">11</td>
                 <td data-label="이름">박상용</td>
-                <td data-label="핸드폰번호">010-2484-8972</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-2484-8972</span>
+                    <div class="action-menu">
+                        <a href="tel:010-2484-8972" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-2484-8972" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1972년</td>
             </tr>
             <tr>
                 <td data-label="번호">12</td>
                 <td data-label="이름">박우민</td>
-                <td data-label="핸드폰번호">010-6316-4796</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6316-4796</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6316-4796" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6316-4796" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1985년</td>
             </tr>
             <tr>
                 <td data-label="번호">13</td>
                 <td data-label="이름">박철수</td>
-                <td data-label="핸드폰번호">010-6342-8872</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6342-8872</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6342-8872" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6342-8872" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1977년</td>
             </tr>
             <tr>
                 <td data-label="번호">14</td>
                 <td data-label="이름">서성하</td>
-                <td data-label="핸드폰번호">010-3701-7004</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-3701-7004</span>
+                    <div class="action-menu">
+                        <a href="tel:010-3701-7004" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-3701-7004" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1970년</td>
             </tr>
             <tr>
                 <td data-label="번호">15</td>
                 <td data-label="이름">송호준</td>
-                <td data-label="핸드폰번호">010-3224-7299</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-3224-7299</span>
+                    <div class="action-menu">
+                        <a href="tel:010-3224-7299" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-3224-7299" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1973년</td>
             </tr>
             <tr>
                 <td data-label="번호">16</td>
                 <td data-label="이름">오찬욱</td>
-                <td data-label="핸드폰번호">010-4745-1577</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-4745-1577</span>
+                    <div class="action-menu">
+                        <a href="tel:010-4745-1577" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-4745-1577" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1972년</td>
             </tr>
             <tr>
                 <td data-label="번호">17</td>
                 <td data-label="이름">이정은</td>
-                <td data-label="핸드폰번호">010-9750-2084</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-9750-2084</span>
+                    <div class="action-menu">
+                        <a href="tel:010-9750-2084" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-9750-2084" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1980년</td>
             </tr>
             <tr>
                 <td data-label="번호">18</td>
                 <td data-label="이름">이준영</td>
-                <td data-label="핸드폰번호">010-5755-5856</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-5755-5856</span>
+                    <div class="action-menu">
+                        <a href="tel:010-5755-5856" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-5755-5856" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1969년</td>
             </tr>
             <tr>
                 <td data-label="번호">19</td>
                 <td data-label="이름">전진용</td>
-                <td data-label="핸드폰번호">010-5910-7673</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-5910-7673</span>
+                    <div class="action-menu">
+                        <a href="tel:010-5910-7673" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-5910-7673" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1969년</td>
             </tr>
             <tr>
                 <td data-label="번호">20</td>
                 <td data-label="이름">진상무</td>
-                <td data-label="핸드폰번호">010-6723-5098</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6723-5098</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6723-5098" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6723-5098" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1979년</td>
             </tr>
             <tr>
                 <td data-label="번호">21</td>
                 <td data-label="이름">최영진</td>
-                <td data-label="핸드폰번호">010-8861-4291</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-8861-4291</span>
+                    <div class="action-menu">
+                        <a href="tel:010-8861-4291" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-8861-4291" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1973년</td>
             </tr>
             <tr>
                 <td data-label="번호">22</td>
                 <td data-label="이름">황도영</td>
-                <td data-label="핸드폰번호">010-6337-7129</td>
+                <td data-label="핸드폰번호">
+                    <span class="phone-number" onclick="toggleMenu(this)">010-6337-7129</span>
+                    <div class="action-menu">
+                        <a href="tel:010-6337-7129" class="action-btn btn-call">전화</a>
+                        <a href="sms:010-6337-7129" class="action-btn btn-sms">문자</a>
+                        <a href="intent://plusfriend/chat/_xcxlYxlE#Intent;scheme=kakaolink;package=com.kakao.talk;end" class="action-btn btn-talk" onclick="alert('카카오톡 앱을 실행합니다.')">카톡</a>
+                    </div>
+                </td>
                 <td data-label="출생년도">1968년</td>
             </tr>
         </tbody>
@@ -300,6 +482,26 @@ function filterTable() {
                 tr[i].style.display = "none";
             }
         }
+    }
+}
+
+// 전화번호 클릭 시 메뉴 토글 함수
+function toggleMenu(element) {
+    var menu = element.nextElementSibling;
+    
+    // 열려있는 다른 메뉴들을 모두 닫음
+    var allMenus = document.querySelectorAll('.action-menu');
+    allMenus.forEach(function(m) {
+        if (m !== menu) {
+            m.style.display = 'none';
+        }
+    });
+
+    // 현재 클릭한 번호의 메뉴를 토글
+    if (menu.style.display === 'flex') {
+        menu.style.display = 'none';
+    } else {
+        menu.style.display = 'flex';
     }
 }
 </script>
