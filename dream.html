@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자이 및 한신 자금 정산 내역 (차액 계산 기능 추가)</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 900px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .desc {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        
+        /* 차액 표시 보드 스타일 */
+        .diff-board {
+            background-color: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        .diff-board.xi-more { background-color: #fff5f5; border-color: #ffa8a8; color: #c92a2a; }
+        .diff-board.hs-more { background-color: #e7f5ff; border-color: #a5d8ff; color: #1c7ed6; }
+        .diff-board.same { background-color: #f4fce3; border-color: #d8f5a2; color: #37b24d; }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save { background-color: #007bff; color: white; }
+        .btn-save:hover { background-color: #0056b3; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-reset:hover { background-color: #5a6268; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #dcdcdc;
+            padding: 0;
+            height: 38px;
+        }
+        th {
+            background-color: #f2f4f7;
+            font-weight: bold;
+            color: #222;
+            text-align: center;
+            padding: 10px 12px;
+        }
+        input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0 12px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: transparent;
+            font-family: inherit;
+        }
+        input:focus {
+            outline: 2px solid #007bff;
+            background-color: #fff;
+        }
+        .label-input { text-align: left; color: #333; }
+        .amount-input { text-align: right; color: #111; }
+        .negative-input {
+            text-align: right;
+            color: #dc3545;
+            font-weight: 500;
+        }
+        .summary-row th {
+            background-color: #e9ecef;
+            font-size: 15px;
+        }
+        .total-amount {
+            text-align: right;
+            font-weight: bold;
+            color: #212529;
+            background-color: #f1f3f5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>아파트 정산 관리 시스템</h2>
+    <div class="desc">※ 각 칸의 금액 변경 시 첫 번째 항목(총합) 및 양측 차액이 실시간 자동 계산됩니다.</div>
+    
+    <!-- 실시간 합계 차이 표시 영역 -->
+    <div id="diff-display" class="diff-board">
+        계산 중...
+    </div>
+    
+    <div class="btn-container">
+        <button class="btn-save" onclick="saveData()">내용 저장하기</button>
+        <button class="btn-reset" onclick="resetData()">원래대로 초기화</button>
+    </div>
+
+    <table>
+        <colgroup>
+            <col style="width: 25%;">
+            <col style="width: 25%;">
+            <col style="width: 25%;">
+            <col style="width: 25%;">
+        </colgroup>
+        <thead>
+            <tr class="summary-row">
+                <th colspan="2">자이</th>
+                <th colspan="2">한신</th>
+            </tr>
+            <tr class="summary-row">
+                <th>총 정산 금액</th>
+                <th id="xi-total" class="total-amount">0</th>
+                <th>총 정산 금액</th>
+                <th id="hs-total" class="total-amount">0</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- 자바스크립트동적 생성 -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+const defaultData = [
+    { xiL: "판매가", xiV: "255,000,000", hsL: "구입가", hsV: "425,000,000" },
+    { xiL: "에어컨", xiV: "0", hsL: "취등록세", hsV: "4,670,000" },
+    { xiL: "퇴직금중간정산", xiV: "100,000,000", hsL: "", hsV: "" },
+    { xiL: "대출", xiV: "100,000,000", hsL: "중문", hsV: "600,000" },
+    { xiL: "청약통장", xiV: "19,222,610", hsL: "냉장고장", hsV: "600,000" },
+    { xiL: "기존대출상환", xiV: "-31,700,000", hsL: "대출실행이자", hsV: "" },
+    { xiL: "부동산중개수수료", xiV: "-1,122,000", hsL: "", hsV: "1,870,000" },
+    { xiL: "이사비용", xiV: "-1,450,000", hsL: "승강기사용료", hsV: "100,000" },
+    { xiL: "법무사", xiV: "-500,000", hsL: "법무사", hsV: "500,000" },
+    { xiL: "장기수선충당금", xiV: "", hsL: "", hsV: "" },
+    { xiL: "관리비및공과금", xiV: "", hsL: "", hsV: "" },
+    { xiL: "선수관리비", xiV: "224,000", hsL: "", hsV: "330,000" },
+    { xiL: "", xiV: "", hsL: "침대", hsV: "900,000" },
+    { xiL: "", xiV: "", hsL: "식탁", hsV: "600,000" },
+    { xiL: "", xiV: "", hsL: "세탁기,건조기", hsV: "2,700,000" },
+    { xiL: "", xiV: "", hsL: "식기세척기", hsV: "1,500,000" },
+    { xiL: "", xiV: "", hsL: "TV거치대", hsV: "210,000" }
+];
+
+let currentData = JSON.parse(localStorage.getItem('aptData')) || [...defaultData];
+const tbody = document.getElementById('table-body');
+
+function renderTable() {
+    tbody.innerHTML = '';
+    currentData.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" class="label-input" value="${row.xiL}" onchange="updateData(${index}, 'xiL', this.value)"></td>
+            <td><input type="text" class="${getAmountClass(row.xiV)}" value="${formatNumber(row.xiV)}" onfocus="removeFormatting(this)" onblur="handleBlur(${index}, 'xiV', this)"></td>
+            <td><input type="text" class="label-input" value="${row.hsL}" onchange="updateData(${index}, 'hsL', this.value)"></td>
+            <td><input type="text" class="${getAmountClass(row.hsV)}" value="${formatNumber(row.hsV)}" onfocus="removeFormatting(this)" onblur="handleBlur(${index}, 'hsV', this)"></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    calculateTotals();
+}
+
+function getAmountClass(val) {
+    if (!val) return "amount-input";
+    const num = parseFloat(val.replace(/,/g, ''));
+    return num < 0 ? "negative-input" : "amount-input";
+}
+
+function formatNumber(val) {
+    if (!val && val !== 0) return "";
+    let str = val.toString().replace(/,/g, '');
+    if (isNaN(str) || str === "") return val;
+    return Number(str).toLocaleString('ko-KR');
+}
+
+function removeFormatting(input) {
+    input.value = input.value.replace(/,/g, '');
+}
+
+function handleBlur(index, field, input) {
+    let val = input.value.trim();
+    updateData(index, field, val);
+    input.className = getAmountClass(val);
+    input.value = formatNumber(val);
+}
+
+function updateData(index, field, value) {
+    currentData[index][field] = value;
+    calculateTotals();
+}
+
+// 총 금액 및 차액 연산 함수
+function calculateTotals() {
+    let xiTotal = 0;
+    let hsTotal = 0;
+
+    currentData.forEach(row => {
+        if (row.xiV) {
+            const num = parseFloat(row.xiV.toString().replace(/,/g, ''));
+            if (!isNaN(num)) xiTotal += num;
+        }
+        if (row.hsV) {
+            const num = parseFloat(row.hsV.toString().replace(/,/g, ''));
+            if (!isNaN(num)) hsTotal += num;
+        }
+    });
+
+    // 화면 갱신
+    document.getElementById('xi-total').innerText = xiTotal.toLocaleString('ko-KR');
+    document.getElementById('hs-total').innerText = hsTotal.toLocaleString('ko-KR');
+
+    // 차액 연산 및 문구 제어
+    const diffDisplay = document.getElementById('diff-display');
+    const diff = xiTotal - hsTotal;
+
+    if (diff > 0) {
+        diffDisplay.className = "diff-board xi-more";
+        diffDisplay.innerHTML = `🔴 <strong>자이</strong> 총합계가 <strong>한신</strong>보다 <span style="text-decoration: underline;">${diff.toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+    } else if (diff < 0) {
+        diffDisplay.className = "diff-board hs-more";
+        diffDisplay.innerHTML = `🔵 <strong>한신</strong> 총합계가 <strong>자이</strong>보다 <span style="text-decoration: underline;">${Math.abs(diff).toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+    } else {
+        diffDisplay.className = "diff-board same";
+        diffDisplay.innerHTML = `🟢 두 아파트의 총 정산 금액이 <strong>정확히 일치</strong>합니다.`;
+    }
+}
+
+function saveData() {
+    localStorage.setItem('aptData', JSON.stringify(currentData));
+    alert('수정 및 차액 계산 내역이 브라우저에 안전하게 저장되었습니다!');
+}
+
+function resetData() {
+    if (confirm('정말 최초 원본 데이터로 초기화하시겠습니까?')) {
+        localStorage.removeItem('aptData');
+        currentData = JSON.parse(JSON.stringify(defaultData));
+        renderTable();
+    }
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
