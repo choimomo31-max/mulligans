@@ -256,10 +256,10 @@ function calculateTotals() {
 
     if (diff > 0) {
         diffDisplay.className = "diff-board xi-more";
-        diffDisplay.innerHTML = `🔴 <strong>자이</strong> 가 <span style="text-decoration: underline;">${diff.toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+        diffDisplay.innerHTML = `🔴 <strong>자이</strong> <span style="text-decoration: underline;">${diff.toLocaleString('ko-KR')}원</span> 더 많습니다.`;
     } else if (diff < 0) {
         diffDisplay.className = "diff-board hs-more";
-        diffDisplay.innerHTML = `🔵 <strong>한신</strong> 이 <span style="text-decoration: underline;">${Math.abs(diff).toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+        diffDisplay.innerHTML = `🔵 <strong>한신</strong> <span style="text-decoration: underline;">${Math.abs(diff).toLocaleString('ko-KR')}원</span> 더 많습니다.`;
     } else {
         diffDisplay.className = "diff-board same";
         diffDisplay.innerHTML = `🟢 두 아파트의 총 정산 금액이 <strong>정확히 일치</strong>합니다.`;
