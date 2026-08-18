@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>자이 및 한신 자금 정산 내역 (차액 계산 기능 추가)</title>
+    <title>자이 및 한신 자금 정산 내역</title>
     <style>
         body {
             font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
@@ -152,9 +152,9 @@
                 <th colspan="2">한신</th>
             </tr>
             <tr class="summary-row">
-                <th>총 정산 금액</th>
+                <th>총합계</th>
                 <th id="xi-total" class="total-amount">0</th>
-                <th>총 정산 금액</th>
+                <th>총합계</th>
                 <th id="hs-total" class="total-amount">0</th>
             </tr>
         </thead>
@@ -258,10 +258,10 @@ function calculateTotals() {
 
     if (diff > 0) {
         diffDisplay.className = "diff-board xi-more";
-        diffDisplay.innerHTML = `🔴 <strong>자이</strong> 총합계가 <strong>한신</strong>보다 <span style="text-decoration: underline;">${diff.toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+        diffDisplay.innerHTML = `🔴 <strong>자이</strong> 가 <span style="text-decoration: underline;">${diff.toLocaleString('ko-KR')}원</span> 더 많습니다.`;
     } else if (diff < 0) {
         diffDisplay.className = "diff-board hs-more";
-        diffDisplay.innerHTML = `🔵 <strong>한신</strong> 총합계가 <strong>자이</strong>보다 <span style="text-decoration: underline;">${Math.abs(diff).toLocaleString('ko-KR')}원</span> 더 많습니다.`;
+        diffDisplay.innerHTML = `🔵 <strong>한신</strong> 이 <span style="text-decoration: underline;">${Math.abs(diff).toLocaleString('ko-KR')}원</span> 더 많습니다.`;
     } else {
         diffDisplay.className = "diff-board same";
         diffDisplay.innerHTML = `🟢 두 아파트의 총 정산 금액이 <strong>정확히 일치</strong>합니다.`;
